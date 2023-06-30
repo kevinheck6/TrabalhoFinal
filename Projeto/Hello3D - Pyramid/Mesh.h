@@ -29,6 +29,8 @@ public:
 
 	void stopRotateContinuous();
 
+	void setPosition(glm::vec3 position);
+
 
 protected:
 	bool shouldAnimationFinish();

@@ -1,4 +1,4 @@
-Atualmente todas as etapas tirando o modulo 6 estão presentes
+Todos os modulos foram concluidos
 
 W-A-S-D move a camera
 Botão esquerdo do Mouse muda o objeto selecionado - Objeto se mexe para mostrar que é o objeto selecionado

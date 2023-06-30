@@ -148,3 +148,8 @@ void Mesh::stopAnimation() {
 	animationStartTime = 0.0;
 	animationDuration = 0.0;
 }
+
+void Mesh::setPosition(glm::vec3 position) {
+	this->position = position;
+	update();
+}
