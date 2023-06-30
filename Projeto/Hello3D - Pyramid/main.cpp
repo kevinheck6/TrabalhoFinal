@@ -22,7 +22,7 @@
 using namespace std;
 
 Mesh suzanne1, suzanne2, suzanne3;
-std::vector<Mesh*> suzanneObjects;
+std::vector<Mesh*> interactiveObjects;
 
 
 struct Vertex
@@ -83,6 +83,7 @@ void performCircularMovement(GLFWwindow* window, float& angle, glm::vec3& lightP
 vector<glm::vec3> generateControlPointsSet();
 GLuint generateControlPointsBuffer(vector <glm::vec3> controlPoints);
 std::vector<glm::vec3> generatePointsSet();
+std::vector<Mesh> instantiateCubesForSmoke(Shader& shader, GLuint VAO, int nVertices, GLuint texID);
 
 
 const GLuint WIDTH = 1000, HEIGHT = 1000;
@@ -137,14 +138,17 @@ int main()
 	GLuint VAO2 = loadSimpleObj("../../3D_Models/Cube/cube.obj", nVertices);
 	GLuint VAO3 = loadSimpleObj("../../3D_Models/Cube/cube.obj", nVertices, glm::vec3(1.0, 1.0, 0.0));
 
-	Mesh suzanne1, suzanne2, suzanne3;
-	suzanne1.initialize(VAO, nVertices, &shader, texID ,glm::vec3(-1.75, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0), true);
-	suzanne2.initialize(VAO2, nVertices, &shader, texID, glm::vec3(1, 0.0, 0.0));
-	suzanne3.initialize(VAO3, nVertices, &shader, texID, glm::vec3(0, 0.0, 0.0));
+	Mesh cube1, cube2, cube3;
+	cube1.initialize(VAO, nVertices, &shader, texID ,glm::vec3(-1.75, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0), true);
+	cube2.initialize(VAO2, nVertices, &shader, texID, glm::vec3(1, 0.0, 0.0));
+	cube3.initialize(VAO3, nVertices, &shader, texID, glm::vec3(0, 0.0, 0.0));
 
-	suzanneObjects.push_back(&suzanne1);
-	suzanneObjects.push_back(&suzanne2);
-	suzanneObjects.push_back(&suzanne3);
+	//Lista de objetos que podem ser interagidos
+	interactiveObjects.push_back(&cube1);
+	interactiveObjects.push_back(&cube2);
+	interactiveObjects.push_back(&cube3);
+
+	//instantiateCubesForSmoke(VAO, nVertices, &shader, texID);
 
 	
 	glUseProgram(shader.ID);
@@ -225,22 +229,22 @@ int main()
 
 		
 
-		suzanne1.update();
-		suzanne1.draw();
-		suzanne2.update();
-		suzanne2.draw();
-		suzanne3.update();
-		suzanne3.draw();
+		cube1.update();
+		cube1.draw();
+		cube2.update();
+		cube2.draw();
+		cube3.update();
+		cube3.draw();
 
 		mouse_button_callback_runtime(window, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, GLFW_MOD_SHIFT);
 
 		setShaderFloat(shader, "../../3D_Models/Cube/cube.mtl");
-		suzanne2.update();
-		suzanne2.draw();
+		cube2.update();
+		cube2.draw();
 
 		setShaderFloat(shader, "../../3D_Models/Cube/cube.mtl");
-		suzanne3.update();
-		suzanne3.draw();
+		cube3.update();
+		cube3.draw();
 
 
 		// Call the circular movement function
@@ -257,13 +261,13 @@ int main()
 
 
 		glm::vec3 pointOnCurve = bezier.getPointOnCurve(i);
-		suzanne3.setPosition(pointOnCurve);
-		suzanne3.update();
-		suzanne3.draw();
+		cube3.setPosition(pointOnCurve);
+		cube3.update();
+		cube3.draw();
 
 		i = (i + 1) % nbCurvePoints;
 		
-		for (Mesh* object : suzanneObjects)
+		for (Mesh* object : interactiveObjects)
 		{
 			object->update();
 			object->draw();
@@ -474,7 +478,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void mouse_button_callback_runtime(GLFWwindow* window, int button, int action, int mods) {
 	static int selectedObjectIndex = 0;
-	Mesh* previousSelectedObject = suzanneObjects[selectedObjectIndex];
+	Mesh* previousSelectedObject = interactiveObjects[selectedObjectIndex];
 	
 
 	static double lastObjectChangeTime = glfwGetTime();
@@ -484,19 +488,19 @@ void mouse_button_callback_runtime(GLFWwindow* window, int button, int action, i
 		double currentTime = glfwGetTime();
 		if (currentTime - lastObjectChangeTime >= objectChangeDelay) {
 			// Cycle through the objects using the right mouse button
-			selectedObjectIndex = (selectedObjectIndex + 1) % suzanneObjects.size();
+			selectedObjectIndex = (selectedObjectIndex + 1) % interactiveObjects.size();
 			// Verify that the selectedObjectIndex is within the valid range
-			if (selectedObjectIndex >= 0 && selectedObjectIndex < suzanneObjects.size()) {
+			if (selectedObjectIndex >= 0 && selectedObjectIndex < interactiveObjects.size()) {
 				printf("Selected object: %d\n", selectedObjectIndex);
 				previousSelectedObject->setSelected(false);
-				suzanneObjects[selectedObjectIndex]->setSelected(true);
-				suzanneObjects[selectedObjectIndex]->animateSize(1.1f, 1.0f);
+				interactiveObjects[selectedObjectIndex]->setSelected(true);
+				interactiveObjects[selectedObjectIndex]->animateSize(1.1f, 1.0f);
 			}
 			lastObjectChangeTime = currentTime;
 		}
 	}
 
-	Mesh* currentSelectedObject = suzanneObjects[selectedObjectIndex];
+	Mesh* currentSelectedObject = interactiveObjects[selectedObjectIndex];
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		// Rotate the selected object continuously
@@ -795,4 +799,18 @@ int generateTexture(string filePath)
 
 	return texID;
 }
+
+std::vector<Mesh> instantiateCubesForSmoke(Shader& shader, GLuint VAO, int nVertices, GLuint texID)
+{
+	std::vector<Mesh> cubes;
+
+	for (int i = 0; i < 25; ++i)
+	{
+		Mesh cube;
+		cube.initialize(VAO, nVertices, &shader, texID, glm::vec3(i * 1.0 - 12.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0), true);
+	}
+
+	return cubes;
+}
+
 

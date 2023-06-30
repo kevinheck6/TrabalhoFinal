@@ -3,7 +3,7 @@
 #include <chrono>
 #include <thread>
 
-extern std::vector<Mesh*> suzanneObjects;
+extern std::vector<Mesh*> interactiveObjects;
 void Mesh::initialize(GLuint VAO, int nVertices, Shader* shader, GLuint texID, glm::vec3 position, glm::vec3 scale, bool isSelected, float angle, glm::vec3 axis)
 {//AQUI CIMA
 	this->VAO = VAO;
