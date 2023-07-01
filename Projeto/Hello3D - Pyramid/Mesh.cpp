@@ -5,7 +5,7 @@
 
 extern std::vector<Mesh*> interactiveObjects;
 void Mesh::initialize(GLuint VAO, int nVertices, Shader* shader, GLuint texID, glm::vec3 position, glm::vec3 scale, bool isSelected, float angle, glm::vec3 axis)
-{//AQUI CIMA
+{
 	this->VAO = VAO;
 	this->nVertices = nVertices;
 	this->shader = shader;

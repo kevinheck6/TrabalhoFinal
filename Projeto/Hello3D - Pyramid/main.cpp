@@ -10,12 +10,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Shader.h"
-
 #include "Mesh.h"
 #include "Lighting.h"
-
 #include "Bezier.h"
-
 #include <random>
 #include <algorithm>
 
@@ -23,7 +20,6 @@ using namespace std;
 
 Mesh suzanne1, suzanne2, suzanne3;
 std::vector<Mesh*> interactiveObjects;
-
 
 struct Vertex
 {
@@ -133,20 +129,33 @@ int main()
 
 	int nVertices;
 	GLuint VAO = loadSimpleObj("../../3D_Models/Cube/cube.obj", nVertices);
-
-
 	GLuint VAO2 = loadSimpleObj("../../3D_Models/Cube/cube.obj", nVertices);
 	GLuint VAO3 = loadSimpleObj("../../3D_Models/Cube/cube.obj", nVertices, glm::vec3(1.0, 1.0, 0.0));
 
+
 	Mesh cube1, cube2, cube3;
+
 	cube1.initialize(VAO, nVertices, &shader, texID ,glm::vec3(-1.75, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0), true);
-	cube2.initialize(VAO2, nVertices, &shader, texID, glm::vec3(1, 0.0, 0.0));
-	cube3.initialize(VAO3, nVertices, &shader, texID, glm::vec3(0, 0.0, 0.0));
+	cube2.initialize(VAO2, nVertices, &shader, texID, glm::vec3(0, -2.0, 0.0));
+	cube3.initialize(VAO3, nVertices, &shader, texID, glm::vec3(1, 0.0, 0.0));
+
+	GLuint texIDMacaco = generateTexture("../../3D_models/Suzanne/Suzanne.png");
+	GLuint VAOMacaco = loadSimpleObj("../../3D_Models/Suzanne/SuzanneTri.obj", nVertices);
+	Mesh macaco;
+	macaco.initialize(VAOMacaco, nVertices, &shader, texIDMacaco, glm::vec3(3.0, 0.0, 0.0));
+
+	GLuint texIDBola = generateTexture("../../3D_models/Suzanne/example.bmp");
+	GLuint VAOBola = loadSimpleObj("../../3D_Models/Suzanne/bola.obj", nVertices);
+	Mesh bola;
+	bola.initialize(VAOBola, nVertices, &shader, texIDBola, glm::vec3(3, -2.0, 0.0));
+
 
 	//Lista de objetos que podem ser interagidos
 	interactiveObjects.push_back(&cube1);
 	interactiveObjects.push_back(&cube2);
 	interactiveObjects.push_back(&cube3);
+	interactiveObjects.push_back(&macaco);
+	interactiveObjects.push_back(&bola);
 
 	//instantiateCubesForSmoke(VAO, nVertices, &shader, texID);
 
@@ -235,6 +244,12 @@ int main()
 		cube2.draw();
 		cube3.update();
 		cube3.draw();
+
+		macaco.update();
+		macaco.draw();
+
+		bola.update();
+		bola.draw();
 
 		mouse_button_callback_runtime(window, GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS, GLFW_MOD_SHIFT);
 
@@ -338,88 +353,69 @@ GLuint generateControlPointsBuffer(vector <glm::vec3> controlPoints)
 std::vector<glm::vec3> generatePointsSet()
 {
 	float vertices[] = {
-		-0.262530, 0.376992, 0.000000,
--0.262530, 0.377406, 0.000000,
--0.262530, 0.334639, 0.000000,
--0.262530, 0.223162, 0.000000,
--0.262530, 0.091495, 0.000000,
--0.262371, -0.006710, 0.000000,
--0.261258, -0.071544, -0.000000,
--0.258238, -0.115777, -0.000000,
--0.252355, -0.149133, -0.000000,
--0.242529, -0.179247, -0.000000,
--0.227170, -0.208406, -0.000000,
--0.205134, -0.237216, -0.000000,
--0.177564, -0.264881, -0.000000,
--0.146433, -0.289891, -0.000000,
--0.114730, -0.309272, -0.000000,
--0.084934, -0.320990, -0.000000,
--0.056475, -0.328224, -0.000000,
--0.028237, -0.334170, -0.000000,
-0.000000, -0.336873, -0.000000,
-0.028237, -0.334170, -0.000000,
-0.056475, -0.328224, -0.000000,
-0.084934, -0.320990, -0.000000,
-0.114730, -0.309272, -0.000000,
-0.146433, -0.289891, -0.000000,
-0.177564, -0.264881, -0.000000,
-0.205134, -0.237216, -0.000000,
-0.227170, -0.208406, -0.000000,
-0.242529, -0.179247, -0.000000,
-0.252355, -0.149133, -0.000000,
-0.258238, -0.115777, -0.000000,
-0.261258, -0.071544, -0.000000,
-0.262371, -0.009704, 0.000000,
-0.262530, 0.067542, 0.000000,
-0.262769, 0.153238, 0.000000,
-0.264438, 0.230348, 0.000000,
-0.268678, 0.284286, 0.000000,
-0.275462, 0.320338, 0.000000,
-0.284631, 0.347804, 0.000000,
-0.296661, 0.372170, 0.000000,
-0.311832, 0.396628, 0.000000,
-0.328990, 0.419020, 0.000000,
-0.347274, 0.436734, 0.000000,
-0.368420, 0.450713, 0.000000,
-0.393395, 0.462743, 0.000000,
-0.417496, 0.474456, 0.000000,
-0.436138, 0.487056, 0.000000,
-0.450885, 0.500213, 0.000000,
-0.464572, 0.513277, 0.000000,
-0.478974, 0.525864, 0.000000,
-0.494860, 0.538133, 0.000000,
-0.510031, 0.552151, 0.000000,
-0.522127, 0.570143, 0.000000,
-0.531124, 0.593065, 0.000000,
-0.537629, 0.620809, 0.000000,
-0.542465, 0.650303, 0.000000,
-0.546798, 0.678259, 0.000000,
-0.552959, 0.703513, 0.000000,
-0.563121, 0.725745, 0.000000,
-0.577656, 0.745911, 0.000000,
-0.596563, 0.764858, 0.000000,
-0.620160, 0.781738, 0.000000,
-0.648302, 0.795385, 0.000000,
-0.678670, 0.805057, 0.000000,
-0.710336, 0.810741, 0.000000,
-0.750111, 0.814914, 0.000000,
-0.802994, 0.819945, 0.000000,
-0.860771, 0.825435, 0.000000,
+	-0.5, 0.0, 0.1,
+	-0.45, 0.05, 0.2,
+	-0.4, 0.1, 0.3,
+	-0.35, 0.15, 0.4,
+	-0.3, 0.2, 0.5,
+	-0.25, 0.25, 0.4,
+	-0.2, 0.3, 0.3,
+	-0.15, 0.35, 0.2,
+	-0.1, 0.4, 0.1,
+	-0.05, 0.45, 0.0,
+	0.0, 0.5, 0.1,
+	0.05, 0.45, 0.2,
+	0.1, 0.4, 0.3,
+	0.15, 0.35, 0.4,
+	0.2, 0.3, 0.5,
+	0.25, 0.25, 0.6,
+	0.3, 0.2, 0.7,
+	0.35, 0.15, 0.8,
+	0.4, 0.1, 0.5,
+	0.45, 0.05, 0.3,
+	0.5, 0.0, 0.2,
+	0.45, -0.05, 0.1,
+	0.4, -0.1, 0.0,
+	0.35, -0.15, 0.0,
+	0.3, -0.2, 0.0,
+	0.25, -0.25, 0.0,
+	0.2, -0.3, 0.0,
+	0.15, -0.35, 0.0,
+	0.1, -0.4, 0.0,
+	0.05, -0.45, 0.0,
+	0.0, -0.5, 0.0,
+	-0.05, -0.45, 0.0,
+	-0.1, -0.4, 0.0,
+	-0.15, -0.35, 0.0,
+	-0.2, -0.3, 0.0,
+	-0.25, -0.25, 0.0,
+	-0.3, -0.2, 0.0,
+	-0.35, -0.15, 0.0,
+	-0.4, -0.1, 0.0,
+	-0.45, -0.05, 0.0,
+	-0.5, 0.0, 0.0
 	};
 
-	vector <glm::vec3> uniPoints;
+	std::vector<glm::vec3> uniPoints;
 
-	for (int i = 0; i < 67 * 3; i += 3)
-	{
+	for (int i = 0; i < sizeof(vertices) / sizeof(vertices[0]); i += 3) {
 		glm::vec3 point;
 		point.x = vertices[i];
 		point.y = vertices[i + 1];
-		point.z = 0.0;
-
+		point.z = vertices[i + 2];
 		uniPoints.push_back(point);
+
+		if (i + 3 < sizeof(vertices) / sizeof(vertices[0])) {
+			glm::vec3 nextPoint;
+			nextPoint.x = (vertices[i] + vertices[i + 3]) / 2.0;
+			nextPoint.y = (vertices[i + 1] + vertices[i + 4]) / 2.0;
+			nextPoint.z = (vertices[i + 2] + vertices[i + 5]) / 2.0;
+			uniPoints.push_back(nextPoint);
+		}
 	}
 
 	return uniPoints;
+
 }
 
 
